@@ -7,7 +7,7 @@
 
 
 # Version
-readonly VERSION="1.0.0"
+readonly VERSION="1.1.0"
 
 
 # ----------------------------------------
@@ -536,7 +536,7 @@ pruneRepository() {
 reportOut() {
   
   MAIL_FOUND=0
-  if hash mail 2>/dev/null; then
+  if hash sendmail 2>/dev/null; then
     MAIL_FOUND=1
   fi
   
@@ -544,13 +544,16 @@ reportOut() {
     cat /tmp/BorgBackupTEXT_$$.log
   else
     
+    local DATE=`date +"%a, %d %b %Y %H:%M:%S"`
     local BOUNDARY="gc0p4Jq0M2Yt08jU534c0p"
+    
+    local HEADER="To: $EMAIL_ADDR\r\nSubject: BorgBackup Scripter - $ARG_REPO\r\nContent-Type: multipart/alternative; boundary=\"$BOUNDARY\"\r\nDate: $DATE"
     
     local HTML_CONTENT="<html><head><style>body {margin:0;padding:15px;font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:15px;color:hsl(0, 0%, 15%)}li {padding:1px 0;}h2 {font-size:1.5em;line-height:1em;}h3 {margin-top:2em;padding-bottom:0.25em;font-size:1.17em;line-height:1em;border-bottom:1px solid hsl(0, 0%, 75%);}.content {padding-left:1em;}table {font-size:13px;line-height:15px;border-collapse:collapse;}table tr td:nth-child(1) {font-weight:bold;}table tr td:nth-child(2) {padding-left:1em;}pre {font-size:12px;line-height:14px;}.error {color:hsl(0, 100%, 35%);}</style></head><body><h2>BorgBackup Scripter Report</h2>$(cat /tmp/BorgBackupHTML_$$.log)</body></html>"
 
-    local CONTENT="\r\n--$BOUNDARY\nContent-Type: text/text; charset=\"UTF-8\"\n\n$(cat /tmp/BorgBackupTEXT_$$.log)\n\r\n--$BOUNDARY\nContent-Type: text/html; charset=\"UTF-8\"\n\n$HTML_CONTENT\n\r\n--$BOUNDARY"
-  
-    echo -e "$CONTENT" | mail -s "$(echo -e "BorgBackup Scripter - ${ARG_REPO}\nContent-Type: multipart/alternative; boundary=\"$BOUNDARY\"")" $EMAIL_ADDR
+    local CONTENT="$HEADER\r\n\r\n\r\n--$BOUNDARY\nContent-Type: text/text; charset=\"UTF-8\"\n\n$(cat /tmp/BorgBackupTEXT_$$.log)\n\r\n--$BOUNDARY\nContent-Type: text/html; charset=\"UTF-8\"\n\n$HTML_CONTENT"
+    
+    echo -e "$CONTENT" | sendmail -t
   fi
   
   rm -f /tmp/BorgBackupHTML_$$.log

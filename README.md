@@ -23,13 +23,13 @@ BorgBackup Scripter supports configurations for multiple repositories. Each repo
 
 ## Prerequisites
 
-The ```mail``` command must be installed and operational on your system if you intend to use the email functionality. To determine if ```mail``` is available, run:
+The ```sendmail``` command must be installed and operational on your system if you intend to use the email functionality. To determine if ```sendmail``` is available, run:
 
 ```
-which mail
+which sendmail
 ```
 
-If the response is the path of ```mail```'s location (i.e., ```/usr/bin/mail```) then ```mail``` has been found on your system. If no response is provided, then you will need to install ```mail``` on your respective system.
+If the response is the path of ```sendmail```'s location (i.e., ```/usr/sbin/sendmail```) then ```sendmail``` has been found on your system. If no response is provided, then you will need to install ```sendmail``` on your respective system.
 
 ## Installation
 
