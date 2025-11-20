@@ -19,7 +19,7 @@ BorgBackup Scripter supports configurations for multiple repositories. Each repo
   - Prune settings (optional)
 - Bash scripts ran before and after the archive creation process (optional)
 - An exclusion list (optional)
-- Email (HTML and plaintext) with details of the run sent after completion (optional)
+- Email (HTML and/or plaintext) with details of the run sent after completion (optional)
 
 ## Prerequisites
 

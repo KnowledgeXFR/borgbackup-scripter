@@ -1,13 +1,13 @@
 #!/bin/bash
 
 
-# Copyright (c) 2022 Michael J. Bartholomew
+# Copyright (c) 2025 Michael J. Bartholomew
 # License: MIT
 # https://github.com/KnowledgeXFR/borgbackup-scripter
 
 
 # Version
-readonly VERSION="1.1.0"
+readonly VERSION="1.2.0"
 
 
 # ----------------------------------------
@@ -93,6 +93,11 @@ parseConfig() {
     # Email Address
     if [[ $line == "EMAIL_ADDR="* ]]; then
       EMAIL_ADDR=${line:11}
+    fi
+    
+    # Email Body
+    if [[ $line == "EMAIL_BODY="* ]]; then
+      EMAIL_BODY=${line:11}
     fi
     
     # BorgBackup Binary Location
@@ -207,6 +212,23 @@ setupRepository() {
 # Function: Validate configuration values
 # ----------------------------------------
 validateVariables() {
+  
+  # Validate email information
+  EMAIL=1
+  if [ ! $EMAIL_ADDR ] || [[ ${#EMAIL_ADDR} == 0 ]]; then
+    EMAIL=0
+  fi
+  if [ ! $EMAIL_BODY ] || [[ ${#EMAIL_BODY} == 0 ]]; then
+    EMAIL=0
+  fi
+  if [[ $EMAIL == 1 ]]; then
+    if [ "$EMAIL_BODY" != "T" ] && [ "$EMAIL_BODY" != "H" ] && [ "$EMAIL_BODY" != "B" ]; then
+      echo "--------------------------------------------------------------------------------"
+      echo "ERROR: The EMAIL_BODY value must be T, H or B"
+      echo "--------------------------------------------------------------------------------"
+      exit 1
+    fi
+  fi
   
   # Validate if BORG_BIN file path exists
   if [ ! -f $BORG_BIN ]; then
@@ -540,7 +562,7 @@ reportOut() {
     MAIL_FOUND=1
   fi
   
-  if [[ $MAIL_FOUND == 0 ]] || [ ! $EMAIL_ADDR ] || [[ ${#EMAIL_ADDR} == 0 ]]; then
+  if [[ $MAIL_FOUND == 0 ]] || [[ $EMAIL == 0 ]]; then
     cat /tmp/BorgBackupTEXT_$$.log
   else
     
@@ -550,8 +572,17 @@ reportOut() {
     local HEADER="To: $EMAIL_ADDR\r\nSubject: BorgBackup Scripter - $ARG_REPO\r\nContent-Type: multipart/alternative; boundary=\"$BOUNDARY\"\r\nDate: $DATE"
     
     local HTML_CONTENT="<html><head><style>body {margin:0;padding:15px;font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:15px;color:hsl(0, 0%, 15%)}li {padding:1px 0;}h2 {font-size:1.5em;line-height:1em;}h3 {margin-top:2em;padding-bottom:0.25em;font-size:1.17em;line-height:1em;border-bottom:1px solid hsl(0, 0%, 75%);}.content {padding-left:1em;}table {font-size:13px;line-height:15px;border-collapse:collapse;}table tr td:nth-child(1) {font-weight:bold;}table tr td:nth-child(2) {padding-left:1em;}pre {font-size:12px;line-height:14px;}.error {color:hsl(0, 100%, 35%);}</style></head><body><h2>BorgBackup Scripter Report</h2>$(cat /tmp/BorgBackupHTML_$$.log)</body></html>"
-
-    local CONTENT="$HEADER\r\n\r\n\r\n--$BOUNDARY\nContent-Type: text/text; charset=\"UTF-8\"\n\n$(cat /tmp/BorgBackupTEXT_$$.log)\n\r\n--$BOUNDARY\nContent-Type: text/html; charset=\"UTF-8\"\n\n$HTML_CONTENT"
+    
+    local CONTENT="$HEADER\r\n\r\n\r\n"
+    if [[ $EMAIL_BODY == "T" ]]; then
+      CONTENT="$CONTENT--$BOUNDARY\nContent-Type: text/text; charset=\"UTF-8\"\n\n$(cat /tmp/BorgBackupTEXT_$$.log)"
+    fi
+    if [[ $EMAIL_BODY == "H" ]]; then
+      CONTENT="$CONTENT--$BOUNDARY\nContent-Type: text/html; charset=\"UTF-8\"\n\n$HTML_CONTENT"
+    fi
+    if [[ $EMAIL_BODY == "B" ]]; then
+      CONTENT="$CONTENT--$BOUNDARY\nContent-Type: text/text; charset=\"UTF-8\"\n\n$(cat /tmp/BorgBackupTEXT_$$.log)\n\r\n--$BOUNDARY\nContent-Type: text/html; charset=\"UTF-8\"\n\n$HTML_CONTENT"
+    fi
     
     echo -e "$CONTENT" | sendmail -t
   fi
