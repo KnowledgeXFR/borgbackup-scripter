@@ -312,7 +312,7 @@ validateVariables() {
   fi
   
   # Path(s)
-  if [ ! $PATHS ] || [[ ${#PATHS[@]} == 0 ]]; then
+  if [[ ${#PATHS[@]} == 0 ]]; then
     echo "--------------------------------------------------------------------------------"
     echo "ERROR: At least one path must be populated in repo.conf"
     echo "--------------------------------------------------------------------------------"
