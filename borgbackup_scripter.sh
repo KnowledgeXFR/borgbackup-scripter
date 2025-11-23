@@ -168,7 +168,7 @@ parseConfig() {
       PATHS_FOUND=1
     fi
     if [[ $PATHS_FOUND == 1 ]] && [[ $line == "- "* ]]; then
-      PATHS+=(${line:2})
+      PATHS+=("${line:2}")
     fi
     
   done < "$REPO_CONF"
