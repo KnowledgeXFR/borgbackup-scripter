@@ -7,7 +7,7 @@
 
 
 # Version
-readonly VERSION="1.2.0"
+readonly VERSION="1.2.2"
 
 
 # ----------------------------------------
