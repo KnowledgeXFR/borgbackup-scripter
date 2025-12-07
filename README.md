@@ -74,6 +74,8 @@ This will:
 
 Now, edit the files in the new directory to meet your needs.
 
+***Note:** If you you do not receive emails when the script is ran via cron, but do when ran directly from the CLI, you will need to add the path where `sendmail` is located to the `ADD_PATHS` variable in the repo.conf file for each repository.*
+
 #### File Notes
 
 ##### excluded.txt

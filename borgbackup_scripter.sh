@@ -7,7 +7,7 @@
 
 
 # Version
-readonly VERSION="1.2.2"
+readonly VERSION="1.2.3"
 
 
 # ----------------------------------------
@@ -103,6 +103,11 @@ parseConfig() {
     # BorgBackup Binary Location
     if [[ $line == "BORG_BIN="* ]]; then
       BORG_BIN=${line:9}
+    fi
+    
+    # Additional Paths
+    if [[ $line == "ADD_PATHS="* ]]; then
+      ADD_PATHS=${line:10}
     fi
     
     # Caffeinate
@@ -608,6 +613,12 @@ parseConfig
 
 # Validate config variables
 validateVariables
+
+
+# Add additional PATH(s), if populated
+if [ $ADD_PATHS ]; then
+  export PATH=$PATH:$ADD_PATHS
+fi
 
 
 # Run pre.sh
